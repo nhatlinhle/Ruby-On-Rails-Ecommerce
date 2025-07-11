@@ -9,6 +9,18 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
- .a {
-  display: inline;
- }
+* {
+  margin: 0;
+  padding: 0;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+.main-page {
+  background-color: #f2f4f7;
+}
+
+@import "front/header";
+@import "front/footer";

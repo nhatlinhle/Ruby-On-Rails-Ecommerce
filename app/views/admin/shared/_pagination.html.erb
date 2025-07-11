@@ -1,0 +1,23 @@
+<% if collection.total_pages > 1 %>
+  <nav aria-label="Page navigation" class="pull-right mr-4">
+    <ul class="pagination justify-content-center">
+      <% if collection.current_page > 1 %>
+        <li class="page-item">
+          <%= link_to 'Previous', url_for(params.merge(page: collection.current_page - 1)), class: "page-link" %>
+        </li>
+      <% end %>
+
+      <% (1..collection.total_pages).each do |page| %>
+        <li class="page-item <%= 'active' if page == collection.current_page %>">
+          <%= link_to page, url_for(params.merge(page: page)), class: "page-link" %>
+        </li>
+      <% end %>
+
+      <% if collection.current_page < collection.total_pages %>
+        <li class="page-item">
+          <%= link_to 'Next', url_for(params.merge(page: collection.current_page + 1)), class: "page-link" %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+<% end %>

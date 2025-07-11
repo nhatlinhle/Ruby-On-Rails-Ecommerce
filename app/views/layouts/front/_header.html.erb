@@ -1,0 +1,43 @@
+<header class="site-header">
+  <div class="container header-inner d-flex align-items-center justify-content-between">
+    <!-- Logo -->
+    <div class="logo">
+      <%= link_to root_path do %>
+        <%= image_tag "logo.png" , alt: "Logo" , class: "site-logo" %>
+          <% end %>
+    </div>
+
+    <!-- Danh mục -->
+    <div class="categories d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center text-white">
+        <i class="bi bi-list fs-3"></i>
+        Danh mục
+      </div>
+
+      <div class="search-box">
+        <%= form_with url: '' , method: :get, class: 'd-flex align-items-center position-relative' , local: true do |f|
+          %>
+          <button type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+          <%= f.text_field :query, placeholder: "Tìm kiếm..." , class: "search-input" , id: "search-input" %>
+            <% end %>
+      </div>
+    </div>
+
+    <!-- Giỏ hàng -->
+    <div>
+      <button type="button" class="order">
+        <i class="bi bi-box-seam"></i>
+        Kiểm tra đơn hàng
+      </button>
+      <button type="button" class="cart ms-4">
+        <i class="bi bi-cart3"></i>
+        Giỏ hàng
+        <!-- <span class="cart-count">
+            <%= @cart.present? ? @cart.items.count : 0 %>
+          </span> -->
+      </button>
+    </div>
+  </div>
+</header>

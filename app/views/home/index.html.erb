@@ -1,0 +1,36 @@
+<% content_for :title, @title %>
+
+<% content_for :css do %>
+  <%= stylesheet_link_tag "front/home" %>
+<% end %>
+
+<section class="container pt-4">
+  <div class="main-menu-categories d-flex">
+    <% @categories.each do |category| %>
+      <div class="item-category">
+        <a href="#">
+          <img src="<%= category.logo %>" alt="" width="47" height="47">
+          <p><%= category.name %></p>
+        </a>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<section class="pt-5 hot-promotion container">
+  <h3>Khuyến mãi Online</h3>
+
+  <ul class="nav nav-pills hot-promotion-tabs" id="pills-tab" role="tablist">
+    <% @categories.each do |category| %>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-<%= category.slug %>-tab" data-bs-toggle="pill" data-bs-target="#<%= category.slug %>" type="button" role="tab" aria-controls="<%= category.slug %>" aria-selected="true"><%= category.name %></button>
+      </li>
+    <% end %>
+  </ul>
+
+  <div class="tab-content" id="pills-tabContent">
+    <!-- <div class="tab-pane fade show active" id="may-lanh" role="tabpanel" aria-labelledby="pills-home-tab">AAAA</div>
+    <div class="tab-pane fade" id="tu-lanh" role="tabpanel" aria-labelledby="pills-profile-tab">bbbb</div>
+    <div class="tab-pane fade" id="quat-dieu-hoa" role="tabpanel" aria-labelledby="pills-contact-tab">...</div> -->
+  </div>
+</section>

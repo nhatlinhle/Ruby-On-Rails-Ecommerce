@@ -1,0 +1,59 @@
+.site-header { 
+  background: #2a83e9;
+  padding: 10px 0;
+
+  .site-logo {
+    height: 50px;
+    width: 160px;
+  }
+
+  .categories {
+    cursor: pointer;
+  }
+
+  .search-box {
+    width: 300px;
+    border-radius: 32px;
+    background-color: #fff;
+
+    button {
+      background-color: transparent;
+      border: none;
+      position: absolute;
+      left: 9px;
+
+      i {
+        color: #938f8f;
+      }
+    }
+
+    .search-input {
+      margin-left: 30px;
+      border-radius: 32px;
+      padding: 8px;
+      margin-left: 30px;
+      background-color: #fff;
+      border: none;
+      font-size: 12px;
+      line-height: 14px;
+      height: 40px;
+      width: calc(100% - 35px);
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  .cart, .order {
+    padding: 8px 10px;
+    border-radius: 30px;
+    background: transparent;
+    border: none;
+    color: white;
+
+    &:hover {
+      background-color: #2871d5;
+    }
+  }
+}

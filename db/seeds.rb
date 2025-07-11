@@ -11,11 +11,23 @@
 
 require 'faker'
 
+puts "🌱 Seeding started..."
+
+User.delete_all
 100.times do
   User.create!(
     name: Faker::Name.name,
     email: Faker::Internet.unique.email,
     password: "123456",
-    password_confirmation: "123456"
+    password_confirmation: "123456",
+    avatar: Faker::Avatar.image,
+    address: Faker::Address.full_address,
+    birth_day: Faker::Date.birthday(min_age: 18, max_age: 65).strftime("%Y-%m-%d"),
+    phone_number: Faker::PhoneNumber.cell_phone_in_e164
   )
 end
+
+load Rails.root.join('db', 'seeds', 'categories.rb')
+load Rails.root.join('db', 'seeds', 'products.rb')
+
+puts "✅ Seeding done!"
