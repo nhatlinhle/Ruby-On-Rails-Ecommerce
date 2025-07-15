@@ -14,15 +14,17 @@ module UserForms
     def update
       return false unless valid?
 
-      attrs = {
-        name: name,
-        email: email,
-        phone_number: phone_number,
-        birth_day: birth_day,
-        address: address
-      }
+      user.name = name
+      user.email = email
+      user.phone_number = phone_number
+      user.birth_day = birth_day
+      user.address = address
 
-      user.update(attrs)
+      if avatar.present?
+        user.avatar.attach(avatar)
+      end
+
+      user.save
     end
 
     private
@@ -39,7 +41,7 @@ module UserForms
 
       existing_user = User.where(email: email).where.not(id: user.id).first
       if existing_user
-        errors.add(:email, "đã được sử dụng")
+        errors.add(:email, " is already taken")
       end
     end
   end

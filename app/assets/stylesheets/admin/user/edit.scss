@@ -1,0 +1,39 @@
+.avatar-edit {
+  left: -4px;
+  right: 0;
+  margin-inline: auto;
+  width: 124px;
+  height: 124px;
+  bottom: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+
+.avatar-hover-edit:hover + .avatar-edit {
+  display: flex;
+}
+
+.avatar-edit:hover {
+  display: flex;
+}
+
+.avatar-edit input[type="file"] {
+  display: none;
+}
+
+.avatar-edit label {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #8080806e;
+  border: none;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -14,9 +14,31 @@ class Admin::UsersController < Admin::BaseController
     render "admin/users/index"
   end
 
+  def new
+    @form = ::UserForms::CreateUserForm.new(
+      name: nil,
+      email: nil,
+      phone_number: nil,
+      birth_day: nil,
+      address: nil
+    )
+  end
+
+  def create
+    @form = ::UserForms::CreateUserForm.new(user_params_create)
+    if @form.save
+      flash.now[:error] = "User created successfully!"
+      redirect_to admin_users_path
+    else
+      flash.now[:error] = "User creation failed!"
+      render :new, status: :unprocessable_entity
+    end
+  end
+
   def edit
     id = params[:id]
     @user = User.find(id)
+
     @form = ::UserForms::UpdateUserForm.new(
       user: @user,
       name: @user.name,
@@ -29,7 +51,7 @@ class Admin::UsersController < Admin::BaseController
 
   def update
     @user = User.find(params[:id])
-    @form = ::UserForms::UpdateUserForm.new(user_params.merge(user: @user))
+    @form = ::UserForms::UpdateUserForm.new(user_params_update.merge(user: @user))
 
       if @form.update
         flash[:success] = "Update success!"
@@ -54,10 +76,15 @@ class Admin::UsersController < Admin::BaseController
     redirect_to admin_users_path
   end
 
-  def user_params
+  def user_params_update
     params.require(:user_forms_update_user_form).permit(
-      :name, :email, :phone_number, :birth_day,
-      :password, :password_confirmation, :address, :avatar
+      :name, :email, :phone_number, :birth_day, :address, :avatar
+    )
+  end
+
+  def user_params_create
+    params.require(:user_forms_create_user_form).permit(
+      :name, :email, :phone_number, :birth_day, :address, :avatar
     )
   end
 end
