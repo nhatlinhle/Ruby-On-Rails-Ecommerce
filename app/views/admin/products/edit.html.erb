@@ -1,0 +1,315 @@
+<div class="container-fluid">
+  <%= form_with model: @form, url: admin_product_path(@product), method: :patch, local: true do |f| %>
+  <div class="row">
+    <div class="col-md-9 pe-1">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_name">Name</label>
+                <%= f.text_field :name, class: "form-control", placeholder: "Product Name" %>
+                <% if @form.errors[:name].any? %>
+                  <div class="text-danger">
+                    <%= @form.errors[:name].first %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_category_id">Category</label>
+                <%= f.collection_select :category_id, @categories, :id, :name, { prompt: "Select Category" }, class: "form-control" %>
+                <% if @form.errors[:category_id].any? %>
+                  <div class="text-danger">
+                    <%= @form.errors[:category_id].first %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_sku">SKU</label>
+                <%= f.text_field :sku, class: "form-control", placeholder: "SKU" %>
+                <% if @form.errors[:sku].any? %>
+                  <div class="text-danger">
+                    <%= @form.errors[:sku].first %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_price">Price</label>
+                <%= f.number_field :price, class: "form-control", placeholder: "Price" %>
+                <% if @form.errors[:price].any? %>
+                  <div class="text-danger">
+                    <%= @form.errors[:price].first %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_stock_quantity">Stock Quantity</label>
+                <%= f.number_field :stock_quantity, class: "form-control", placeholder: "Stock Quantity" %>
+                <% if @form.errors[:stock_quantity].any? %>
+                  <div class="text-danger">
+                    <%= @form.errors[:stock_quantity].first %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_description">Description</label>
+                <%= f.text_area :description, class: "form-control", placeholder: "Product Description", style: "height: 200px; resize: vertical;" %>
+                <% if @form.errors[:description].any? %>
+                  <div class="text-danger">
+                    <%= @form.errors[:description].first %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header pb-3" style="border-bottom: 1px solid #bfbfbf !important;">
+          <h5 class="card-title fw-bold text-secondary">Product data</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="d-flex align-items-start nav-tabs-vertical-custom">
+            <div class="nav flex-column nav-pills me-3 block-nav-items" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+              <button class="nav-link active" id="v-pills-general-tab" data-bs-toggle="pill" data-bs-target="#v-pills-general" type="button" role="tab" aria-controls="v-pills-general" aria-selected="true">General</button>
+              <button class="nav-link" id="v-pills-attributes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-attributes" type="button" role="tab" aria-controls="v-pills-attributes" aria-selected="false">Attributes</button>
+              <button class="nav-link" id="v-pills-variations-tab" data-bs-toggle="pill" data-bs-target="#v-pills-variations" type="button" role="tab" aria-controls="v-pills-variations" aria-selected="false">Variations</button>
+              <button class="nav-link" id="v-pills-metas-tab" data-bs-toggle="pill" data-bs-target="#v-pills-metas" type="button" role="tab" aria-controls="v-pills-metas" aria-selected="false">Meta data</button>
+            </div>
+            <div class="tab-content p-2 flex-grow-1" id="v-pills-tabContent">
+              <div class="tab-pane fade show active" id="v-pills-general" role="tabpanel" aria-labelledby="v-pills-general-tab" tabindex="0">...</div>
+              <div class="tab-pane fade" id="v-pills-attributes" role="tabpanel" aria-labelledby="v-pills-attributes-tab" tabindex="0">
+                <div class="d-flex align-items-center gap-2">
+                  <button type="button" class="btn btn-outline-info py-1" id="add_attribute_button">Add new</button>
+                  <select class="selectpicker select_existing_attribute">
+                    <option></option>
+                    <% @attributes.each do |attribute| %>
+                      <option value="<%= attribute.id %>"><%= attribute.name %></option>
+                    <% end %>
+                  </select>
+                </div>
+
+                <div>
+                  <div id="product_attributes_wrapper">
+                    <% if false %>
+                    <% @product.product_attribute_values.each do |product_attribute_value| %>
+                      <div class="d-flex align-items-center gap-2 my-2 product-attribute">
+                        <input type="text" class="form-control w-25" name="new_attributes[<%= product_attribute_value.attribute_id %>][name]" placeholder="Attribute Name" disabled value="<%= product_attribute_value.attribute_record.name %>">
+                        <select class="select-multiple" multiple="multiple" name="new_attributes[<%= product_attribute_value.attribute_id %>][options]" data-attribute-id="<%= product_attribute_value.attribute_id %>" style="width: 100%;">
+                          <% product_attribute_value.attribute_record.attribute_values.each do |value| %>
+                            <option value="<%= value.id %>" <%= 'selected' if product_attribute_value.attribute_value_id == value.id %>><%= value.name %></option>
+                          <% end %>
+                        </select>
+                        <button type="button" class="btn btn-danger btn-sm remove-attribute">Remove</button>
+                      </div>
+                    <% end %>
+                    <% end %>
+                  </div>
+
+                  <button type="button" class="btn btn-outline-success pull-right mt-3" id="save_new_attributes">Save new attributes</button>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="v-pills-variations" role="tabpanel" aria-labelledby="v-pills-variations-tab" tabindex="0">...</div>
+              <div class="tab-pane fade" id="v-pills-metas" role="tabpanel" aria-labelledby="v-pills-metas-tab" tabindex="0">
+                <div class="card-body meta-data-body">
+                  <% @product_metas.each_with_index do |meta, index| %>
+                    <div class="row meta-field-row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <% key_field_id = "product_forms_update_product_form_meta_#{index}_key" %>
+                          <label for="<%= key_field_id %>">Meta Key</label>
+                          <%= f.text_field "meta[#{index}][key]", value: meta.key, class: "form-control", id: key_field_id %>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <% value_field_id = "product_forms_update_product_form_meta_#{index}_value" %>
+                          <label for="<%= value_field_id %>">Meta Value</label>
+                          <%= f.text_field "meta[#{index}][value]", value: meta.value, class: "form-control", id: value_field_id %>
+                        </div>
+                      </div>
+
+                      <div class="col-md-2 d-flex align-items-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-meta-field">Remove</button>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <div class="row">
+                    <div class="col-md-12">
+                      <%= link_to "Add more", "#", class: "btn btn-secondary", id: "add-meta-field" %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 px-0">
+      <div class="card">
+        <div class="card-header pb-3" style="border-bottom: 1px solid #bfbfbf !important;">
+          <h5 class="card-title fw-bold text-secondary">Product image</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>
+
+<% content_for :javascripts do %>
+  <script>
+    $(document).ready(function() {
+      $('.selectpicker').select2({
+        placeholder: "Add existing attribute",
+        allowClear: true,
+      });
+
+      $('.select-multiple').select2();
+      const productId = <%= @product.id %>;
+      // Initialize meta index
+      let metaIndex = <%= @product_metas.size %>;
+
+      $('#add-meta-field').click(function(e) {
+        e.preventDefault();
+        const newMetaField = `
+          <div class="row meta-field-row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_meta_${metaIndex}_key">Meta Key</label>
+                <input type="text" 
+                      name="product_forms_update_product_form[meta][${metaIndex}][key]" 
+                      id="product_forms_update_product_form_meta_${metaIndex}_key"
+                      class="form-control" 
+                      placeholder="Meta Key">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="product_forms_update_product_form_meta_${metaIndex}_value">Meta Value</label>
+                <input type="text" 
+                      name="product_forms_update_product_form[meta][${metaIndex}][value]" 
+                      id="product_forms_update_product_form_meta_${metaIndex}_value"
+                      class="form-control" 
+                      placeholder="Meta Value">
+              </div>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-center">
+              <button type="button" class="btn btn-danger btn-sm remove-meta-field">Remove</button>
+            </div>
+          </div>
+        `;
+
+        $('#add-meta-field').closest(".row").before(newMetaField);
+
+        metaIndex++;
+      });
+
+      $(document).on('click', '.remove-meta-field', function(e) {
+        e.preventDefault();
+        $(this).closest('.meta-field-row').remove();
+      });
+
+      let newAttributeIndex = 0;
+
+      $('#add_attribute_button').click(function() {
+        const newAttribute = `
+          <div class="d-flex align-items-center gap-2 my-2 product-attribute">
+            <input type="text" class="form-control w-25" name="new_attributes[${newAttributeIndex}][name]" placeholder="Attribute Name">
+            <textarea name="new_attributes[${newAttributeIndex}][options]" class="form-control" placeholder="Enter options for customers to choose from, f.e. “Blue” or “Large”. Use “|” to separate different options." style="height: 100px;"></textarea>
+            <button type="button" class="btn btn-danger btn-sm remove-attribute">Remove</button>
+          </div>
+        `;
+        $('#product_attributes_wrapper').append(newAttribute);
+        newAttributeIndex++;
+      });
+
+      $(document).on('click', '.remove-attribute', function() {
+        $(this).closest('.product-attribute').remove();
+      });
+
+      $(document).on('click', '#save_new_attributes', function() {
+        const attributes = [];
+        $('#product_attributes_wrapper .product-attribute').each(function() {
+          const name = $(this).find('input[name*="[name]"]').val();
+          const options = $(this).find('textarea[name*="[options]"]').val();
+          const selectMultiple = $(this).find('select.select-multiple');
+          if (name && options) {
+            attributes.push({ name, options: options.split("|").filter(opt => opt.trim() !== "")});
+          }
+
+          if (selectMultiple.length) {
+            const selectedOptions = selectMultiple.val();
+            const dataAttributeId = selectMultiple.data('attribute-id');
+
+            if (selectedOptions && selectedOptions.length > 0) {
+              attributes.push({ name, attribute_id: dataAttributeId, options: selectedOptions, is: 'existing' });
+            }
+          }
+        });
+
+        $.ajax({
+          url: '<%= bulk_create_admin_attributes_path %>',
+          type: 'POST',
+          data: {
+            authenticity_token: '<%= form_authenticity_token %>',
+            attributes: attributes,
+            product_id: productId
+          },
+          success: function(response) {
+            console.log("Attributes saved successfully:", response);
+            alert("Attributes saved successfully!");
+          },
+          error: function(xhr, status, error) {
+            console.error("Error saving attributes:", error);
+            alert("Failed to save attributes. Please try again.");
+          }
+        });
+      });
+
+      $('.select_existing_attribute').change(function () {
+        const attributeId = $(this).val();
+        const attributes = <%= raw @attributes.as_json(include: :attribute_values).to_json %>;
+
+        const selectedAttribute = attributes.find(attr => attr.id == attributeId);
+        if (!selectedAttribute) {
+          console.error("Selected attribute not found");
+          return;
+        }
+
+        const html = `
+          <div class="d-flex align-items-center gap-2 my-2 product-attribute">
+            <input type="text" class="form-control w-25" name="new_attributes[${newAttributeIndex}][name]" placeholder="Attribute Name" disabled value="${selectedAttribute.name}">
+            <select class="select-multiple" multiple="multiple" name="new_attributes[${newAttributeIndex}][options]" data-attribute-id="${attributeId}" style="width: 100%;">
+              ${selectedAttribute.attribute_values.map(value => `<option value="${value.id}">${value.name}</option>`).join('')}
+            </select>
+            <button type="button" class="btn btn-danger btn-sm remove-attribute">Remove</button>
+          </div>`
+        $('#product_attributes_wrapper').append(html);
+        $('.select-multiple').select2()
+      })
+    });
+  </script>
+<% end %>

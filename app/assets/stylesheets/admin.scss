@@ -5320,3 +5320,27 @@ License - nucleoapp.com/license/
     top: 30px;
     min-width: 300px;
 }
+
+.nav-tabs-vertical-custom {
+    .block-nav-items {
+        height: -webkit-fill-available;
+        border-right: 1px solid #ddd;
+        margin-bottom: 0;
+        background-color: #fafafa;
+        min-width: 196px;
+        
+        .nav-link {
+            border-radius: 0;
+            border-bottom: 1px solid #eee;
+            color: #2271b1;
+            padding: 10px;
+            line-height: 20px !important;
+            font-size: 15px;
+            text-align: start;
+            &.active {
+                color: #555;
+                background-color: #eee;
+            }
+        }
+    }
+}

@@ -22,13 +22,13 @@ Rails.application.routes.draw do
     delete "logout", to: "auth#logout", as: :logout
 
     get "", to: "admin#dashboard", as: :dashboard
-
       resources :users
+      resources :products
 
-      resources :products do
-        get "/", to: "products#index", as: :index
-        # get "/:id", to: "products#show", as: :show
-        # thêm các action khác...
+      resources :attributes do
+        collection do
+          post :bulk_create, to: "attributes#bulk_create", as: :bulk_create
+        end
       end
   end
 end
