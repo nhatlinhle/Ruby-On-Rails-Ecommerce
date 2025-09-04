@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <%= form_with model: @form, url: admin_product_path(@product), method: :patch, local: true do |f| %>
+  <%= form_with model: @form, url: admin_product_path(@product), method: :patch, local: true, html: { multipart: true } do |f| %>
   <div class="row">
     <div class="col-md-9 pe-1">
       <div class="card">
@@ -45,7 +45,7 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label for="product_forms_update_product_form_price">Price</label>
-                <%= f.number_field :price, class: "form-control", placeholder: "Price" %>
+                <%= f.number_field :price, class: "form-control", placeholder: "Price", step: :any %>
                 <% if @form.errors[:price].any? %>
                   <div class="text-danger">
                     <%= @form.errors[:price].first %>
@@ -98,68 +98,13 @@
             <div class="tab-content p-2 flex-grow-1" id="v-pills-tabContent">
               <div class="tab-pane fade show active" id="v-pills-general" role="tabpanel" aria-labelledby="v-pills-general-tab" tabindex="0">...</div>
               <div class="tab-pane fade" id="v-pills-attributes" role="tabpanel" aria-labelledby="v-pills-attributes-tab" tabindex="0">
-                <div class="d-flex align-items-center gap-2">
-                  <button type="button" class="btn btn-outline-info py-1" id="add_attribute_button">Add new</button>
-                  <select class="selectpicker select_existing_attribute">
-                    <option></option>
-                    <% @attributes.each do |attribute| %>
-                      <option value="<%= attribute.id %>"><%= attribute.name %></option>
-                    <% end %>
-                  </select>
-                </div>
-
-                <div>
-                  <div id="product_attributes_wrapper">
-                    <% if false %>
-                    <% @product.product_attribute_values.each do |product_attribute_value| %>
-                      <div class="d-flex align-items-center gap-2 my-2 product-attribute">
-                        <input type="text" class="form-control w-25" name="new_attributes[<%= product_attribute_value.attribute_id %>][name]" placeholder="Attribute Name" disabled value="<%= product_attribute_value.attribute_record.name %>">
-                        <select class="select-multiple" multiple="multiple" name="new_attributes[<%= product_attribute_value.attribute_id %>][options]" data-attribute-id="<%= product_attribute_value.attribute_id %>" style="width: 100%;">
-                          <% product_attribute_value.attribute_record.attribute_values.each do |value| %>
-                            <option value="<%= value.id %>" <%= 'selected' if product_attribute_value.attribute_value_id == value.id %>><%= value.name %></option>
-                          <% end %>
-                        </select>
-                        <button type="button" class="btn btn-danger btn-sm remove-attribute">Remove</button>
-                      </div>
-                    <% end %>
-                    <% end %>
-                  </div>
-
-                  <button type="button" class="btn btn-outline-success pull-right mt-3" id="save_new_attributes">Save new attributes</button>
-                </div>
+                <%= render 'admin/products/partials/tab_attributes' %>
               </div>
-              <div class="tab-pane fade" id="v-pills-variations" role="tabpanel" aria-labelledby="v-pills-variations-tab" tabindex="0">...</div>
+              <div class="tab-pane fade" id="v-pills-variations" role="tabpanel" aria-labelledby="v-pills-variations-tab" tabindex="0">
+                <%= render 'admin/products/partials/tab_variations' %>
+              </div>
               <div class="tab-pane fade" id="v-pills-metas" role="tabpanel" aria-labelledby="v-pills-metas-tab" tabindex="0">
-                <div class="card-body meta-data-body">
-                  <% @product_metas.each_with_index do |meta, index| %>
-                    <div class="row meta-field-row">
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <% key_field_id = "product_forms_update_product_form_meta_#{index}_key" %>
-                          <label for="<%= key_field_id %>">Meta Key</label>
-                          <%= f.text_field "meta[#{index}][key]", value: meta.key, class: "form-control", id: key_field_id %>
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <% value_field_id = "product_forms_update_product_form_meta_#{index}_value" %>
-                          <label for="<%= value_field_id %>">Meta Value</label>
-                          <%= f.text_field "meta[#{index}][value]", value: meta.value, class: "form-control", id: value_field_id %>
-                        </div>
-                      </div>
-
-                      <div class="col-md-2 d-flex align-items-center">
-                        <button type="button" class="btn btn-danger btn-sm remove-meta-field">Remove</button>
-                      </div>
-                    </div>
-                  <% end %>
-
-                  <div class="row">
-                    <div class="col-md-12">
-                      <%= link_to "Add more", "#", class: "btn btn-secondary", id: "add-meta-field" %>
-                    </div>
-                  </div>
-                </div>
+                <%= render 'admin/products/partials/tab_meta_data' %>
               </div>
             </div>
           </div>
@@ -170,10 +115,58 @@
     <div class="col-md-3 px-0">
       <div class="card">
         <div class="card-header pb-3" style="border-bottom: 1px solid #bfbfbf !important;">
-          <h5 class="card-title fw-bold text-secondary">Product image</h5>
+          <h5 class="card-title fw-bold text-secondary">Product thumbnail</h5>
+        </div>
+
+        <div class="card-body">
+          <div class="upload-image text-center">
+            <a href="#" class="upload-product-thumbnail" id="upload-product-thumbnail" data-product-id="<%= @product.id %>">
+              <%= image_tag(@product.thumbnail.attached? ? url_for(@product.thumbnail) : '/images/default-thumbnail.png',
+                  alt: 'Product Image',
+                  class: 'img-thumbnail product-image',
+                  id: "preview-product-thumbnail") %>
+            </a>
+
+            <%= file_field_tag "thumbnail",
+                class: "d-none file-input-thumbnail",
+                id: "file-input-product-thumbnail",
+                data: { product_id: @product.id } %>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header pb-3" style="border-bottom: 1px solid #bfbfbf !important;">
+          <h5 class="card-title fw-bold text-secondary">Image gallery</h5>
+        </div>
+
+        <div class="card-body">
+          <div class="gallery-images">
+            <% @product.gallery.each do |image| %>
+              <div class="gallery-image position-relative">
+                <%= image_tag url_for(image), class: 'img-thumbnail' %>
+                <button type="button" class="remove-gallery-image" width="100" height="100" data-image-id="<%= image.id %>">X</button>
+              </div>
+            <% end %>
+          </div>
+          <div class="upload-image text-center mt-3">
+            <a href="#" class="btn btn-primary btn-sm upload-image-btn" id="upload-gallery-image">
+              Add Images
+            </a>
+            <%= file_field_tag "gallery[]",
+                multiple: true,
+                class: "d-none file-input-gallery",
+                id: "file-input-gallery-images",
+                data: { product_id: @product.id } %>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="d-flex justify-content-end mt-3">
+    <button type="submit" class="btn btn-success">Save Product</button>
   </div>
   <% end %>
 </div>
@@ -187,9 +180,9 @@
       });
 
       $('.select-multiple').select2();
-      const productId = <%= @product.id %>;
-      // Initialize meta index
+      const productId = <%= @product.id.to_json %>;
       let metaIndex = <%= @product_metas.size %>;
+      let newAttributeIndex = 0;
 
       $('#add-meta-field').click(function(e) {
         e.preventDefault();
@@ -231,8 +224,6 @@
         e.preventDefault();
         $(this).closest('.meta-field-row').remove();
       });
-
-      let newAttributeIndex = 0;
 
       $('#add_attribute_button').click(function() {
         const newAttribute = `
@@ -279,7 +270,30 @@
             product_id: productId
           },
           success: function(response) {
-            console.log("Attributes saved successfully:", response);
+            response.created.forEach(function(attr) {
+              $('#product_attributes_wrapper .product-attribute').each(function () {
+                const inputName = $(this).find('input[name*="[name]"]');
+                if (inputName.val() === attr.name) {
+                  const select = $('<select>')
+                    .addClass('form-control select-multiple')
+                    .attr('multiple', true)
+                    .attr('data-attribute-id', attr.id);
+
+                  attr.values.forEach(function(value) {
+                    const option = $('<option>')
+                      .val(value.id)
+                      .text(value.name)
+                      .prop('selected', true);
+                    select.append(option);
+                  });
+
+                  $(this).find('textarea[name*="[options]"]').replaceWith(select);
+                  select.select2();
+                  inputName.after(`<input type="hidden" name="attributes[][name]" value="${attr.name}" />`);
+                  inputName.prop('readonly', true);
+                }
+              });
+            });
             alert("Attributes saved successfully!");
           },
           error: function(xhr, status, error) {
@@ -291,7 +305,7 @@
 
       $('.select_existing_attribute').change(function () {
         const attributeId = $(this).val();
-        const attributes = <%= raw @attributes.as_json(include: :attribute_values).to_json %>;
+        const attributes = JSON.parse('<%= j @attributes.as_json(include: :attribute_values).to_json %>');
 
         const selectedAttribute = attributes.find(attr => attr.id == attributeId);
         if (!selectedAttribute) {
@@ -310,6 +324,154 @@
         $('#product_attributes_wrapper').append(html);
         $('.select-multiple').select2()
       })
+
+      $('#v-pills-variations-tab').on('click', function() {
+        $.ajax({
+          url: '<%= get_attributes_by_product_id_admin_attributes_path %>',
+          type: 'GET',
+          data: { product_id: productId },
+          success: function(response) {
+            console.log("Variations loaded successfully:", response);
+          },
+          error: function(xhr, status, error) {
+            console.error("Error loading variations:", error);
+          }
+        });
+      });
+
+      $(document).on('click','.upload-image-btn', function (e) {
+        e.preventDefault();
+        const variationId = $(this).data("variation-id");
+        $(`#file-input-${variationId}`).click();
+      });
+
+      $(document).on('change', ".file-input-variation", function (e) {
+        const variationId = $(this).data("variation-id");
+        const previewImage = $(`#preview-${variationId}`)[0];
+        const file = this.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $(document).on('click','.add-variation-meta-field', function(e) {
+        e.preventDefault();
+        const variationId = $(this).data('variation-id');
+        const newIndexMeta = $(`.variation-meta-field-row-${variationId}`).length;
+
+        const newField = `
+          <div class="row meta-field-row variation-meta-field-row-${variationId}">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="variation_meta_key_${variationId}_${newIndexMeta}">Meta Key</label>
+                <input type="text" 
+                      name="product[variations][${variationId}][product_metas][${newIndexMeta}][key]" 
+                      id="variation_meta_key_${variationId}_${newIndexMeta}"
+                      class="form-control" 
+                      placeholder="Meta Key">
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="variation_meta_value_${variationId}_${newIndexMeta}">Meta Value</label>
+                <input type="text" 
+                      name="product[variations][${variationId}][product_metas][${newIndexMeta}][value]" 
+                      id="variation_meta_value_${variationId}_${newIndexMeta}"
+                      class="form-control" 
+                      placeholder="Meta Value">
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+              <button type="button" class="btn btn-danger btn-sm remove-meta-field">Remove</button>
+            </div>
+          </div>
+        `
+
+        $(this).closest(".row").before(newField);
+      });
+
+      $('#upload-product-thumbnail').on('click', function(e) {
+        e.preventDefault();
+        $('#file-input-product-thumbnail').click();
+      });
+
+      $('#file-input-product-thumbnail').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            $('#preview-product-thumbnail').attr('src', e.target.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $('#upload-gallery-image').on('click', function(e) {
+        e.preventDefault();
+        $('#file-input-gallery-images').click();
+      });
+
+      $('#file-input-gallery-images').on('change', function(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+          const galleryContainer = $('.gallery-images');
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const imageHtml = `
+                <div class="gallery-image position-relative">
+                  <img src="${e.target.result}" class="img-thumbnail" alt="Gallery Image" width="100" height="100">
+                  <button type="button" class="remove-gallery-image" data-image-id="${file.name}">X</button>
+                </div>`;
+              galleryContainer.append(imageHtml);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      });
+
+      $(document).on('click', '.remove-gallery-image', function(e) {
+        e.preventDefault();
+        $(this).closest('.gallery-image').remove();
+      });
+
+      $('.add-variation').on('click', function () {
+        const $template = $('#variation-template');
+        const $newItem = $template.clone();
+
+        let newVariationId = new Date().getTime();
+
+        $newItem
+          .removeClass('d-none')
+          .attr('id', `variation-${newVariationId}`);
+
+        let html = $newItem.html().replace(/NEW_RECORD/g, newVariationId).replace(/variation\.id/g, newVariationId);
+        $newItem.html(html);
+
+        $('#accordion-variations').append($newItem);
+      });
+
+      $(document).on('click', '.remove-variations', function() {
+        $(this).closest('.accordion-item').remove();
+      });
+
+      $(document).on('show.bs.collapse', function(e) {
+        const activeElement = e.currentTarget.activeElement
+        
+        if (activeElement && activeElement.tagName.toLowerCase() === 'select') {
+          e.preventDefault();
+        }
+      });
     });
   </script>
+<% end %>
+
+<% content_for :css do %>
+  <link rel="stylesheet" href="<%= asset_path 'admin/product/edit.css' %>">
 <% end %>

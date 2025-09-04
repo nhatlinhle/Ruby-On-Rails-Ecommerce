@@ -1,0 +1,30 @@
+<div class="card-body meta-data-body">
+  <% @product_metas.each_with_index do |meta, index| %>
+    <div class="row meta-field-row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <% key_field_id="product_forms_update_product_form_meta_#{index}_key" %>
+            <label for="<%= key_field_id %>">Meta Key</label>
+            <%= f.text_field "meta[#{index}][key]" , value: meta.key, class: "form-control" , id: key_field_id %>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <% value_field_id="product_forms_update_product_form_meta_#{index}_value" %>
+            <label for="<%= value_field_id %>">Meta Value</label>
+            <%= f.text_field "meta[#{index}][value]" , value: meta.value, class: "form-control" , id: value_field_id %>
+        </div>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-center">
+        <button type="button" class="btn btn-danger btn-sm remove-meta-field">Remove</button>
+      </div>
+    </div>
+    <% end %>
+
+      <div class="row">
+        <div class="col-md-12">
+          <%= link_to "Add more" , "#" , class: "btn btn-secondary" , id: "add-meta-field" %>
+        </div>
+      </div>
+</div>

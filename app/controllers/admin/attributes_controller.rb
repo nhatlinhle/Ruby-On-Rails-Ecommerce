@@ -1,4 +1,6 @@
 class Admin::AttributesController < Admin::BaseController
+  include AttributeHelper
+
   layout "admin"
 
   def index
@@ -24,61 +26,55 @@ class Admin::AttributesController < Admin::BaseController
   end
 
   def bulk_create
-  if params[:attributes].blank?
-    return render json: { status: "error", message: "No attributes provided." }, status: :unprocessable_entity
-  end
+    return render json: { status: "error", message: "No attributes provided." }, status: :unprocessable_entity if params[:attributes].blank?
 
-  created = []
-  params[:attributes].each do |_index, attr_params|
-    if attr_params["is"].present? && attr_params["is"] == "existing"
-      attribute_id = attr_params["attribute_id"]
-      product_id = params[:product_id]
+    product = Product.find(params[:product_id])
+    expected_pavs = []
+    created_attributes = []
 
-      attr_params["options"].each do |attribute_value_id|
-        ProductAttributeValue.create!(
-          product_id: product_id,
-          attribute_id: attribute_id,
-          attribute_value_id: attribute_value_id
-        )
+    params[:attributes].each do |_index, attr_params|
+      if existing_attribute?(attr_params)
+        expected_pavs.concat build_expected_existing_pavs(attr_params, product.id)
+      else
+        result = create_attribute_and_values(attr_params)
+        expected_pavs.concat result[:pavs].map { |pav| pav.merge(product_id: product.id) }
+        created_attributes << result[:response]
       end
-      next
-    end
-    attribute = Attribute.new(
-      name: attr_params[:name],
-      slug: attr_params[:name].parameterize
-    )
-
-    unless attribute.valid?
-      raise ActiveRecord::RecordInvalid.new(attribute)
     end
 
-    attribute.save!
+    sync_product_attribute_values(product.id, expected_pavs)
 
-    attr_params[:options].each do |value|
-      attr_value = attribute.attribute_values.new(
-        name: value,
-        slug: value.parameterize
-      )
-
-      unless attr_value.valid?
-        raise ActiveRecord::RecordInvalid.new(attr_value)
-      end
-
-      attr_value.save!
-    end
-
-    created << {
-      id: attribute.id,
-      name: attribute.name,
-      values: attribute.attribute_values.pluck(:name)
-    }
-  end
-
-  render json: { status: "success", created: created }
+    render json: { status: "success", created: created_attributes }
 
   rescue ActiveRecord::RecordInvalid => e
     render json: { status: "error", message: e.record.errors.full_messages.join(', ') }, status: :unprocessable_entity
+  rescue => e
+    render json: { status: "error", message: e.message }, status: :unprocessable_entity
+  end
 
+  def get_attributes_by_product_id
+    product = Product.find(params[:product_id])
+
+    grouped = product.product_attribute_values
+      .includes(:attribute_record, :attribute_value)
+      .group_by(&:attribute_record)
+
+    attributes = grouped.map do |attribute, pavs|
+      {
+        id: attribute.id,
+        name: attribute.name,
+        values: pavs.map do |pav|
+          {
+            id: pav.attribute_value.id,
+            name: pav.attribute_value.name
+          }
+        end
+      }
+    end
+
+    render json: { status: "success", attributes: attributes }
+  rescue ActiveRecord::RecordNotFound
+    render json: { status: "error", message: "Product not found." }, status: :not_found
   rescue => e
     render json: { status: "error", message: e.message }, status: :unprocessable_entity
   end

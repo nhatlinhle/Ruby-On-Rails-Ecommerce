@@ -8,7 +8,7 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.string :sku
       t.integer :stock_quantity
       t.integer :parent_id, index: true
-      t.references :category, null: false, foreign_key: true, index: true
+      t.references :category, foreign_key: true, index: true
       t.timestamps
     end
   end

@@ -1,0 +1,35 @@
+<div class="d-flex align-items-center gap-2">
+  <button type="button" class="btn btn-outline-info py-1" id="add_attribute_button">Add new</button>
+  <select class="selectpicker select_existing_attribute">
+    <option></option>
+    <% @attributes.each do |attribute| %>
+      <option value="<%= attribute.id %>">
+        <%= attribute.name %>
+      </option>
+      <% end %>
+  </select>
+</div>
+
+<div>
+  <div id="product_attributes_wrapper">
+    <% @attribute_grouped.each_with_index do |(attribute, values), index| %>
+      <% attribute_id=values.first[:attribute_id] if values.any? %>
+        <div class="d-flex align-items-center gap-2 my-2 product-attribute">
+          <input type="text" class="form-control w-25" name="new_attributes[<%= index %>][name]"
+            placeholder="Attribute Name" value="<%= attribute.name %>" disabled>
+
+          <select class="select-multiple" multiple="multiple" name="new_attributes[<%= index %>][options]"
+            data-attribute-id="<%= attribute_id || '' %>" style="width: 100%;">
+            <% values.each do |value| %>
+              <option value="<%= value[:id] %>" <%='selected' if @existing_value_ids.include?(value[:id]) %>>
+                <%= value[:name] %>
+              </option>
+              <% end %>
+          </select>
+          <button type="button" class="btn btn-danger btn-sm remove-attribute">Remove</button>
+        </div>
+        <% end %>
+  </div>
+  <button type="button" class="btn btn-outline-success pull-right mt-3" id="save_new_attributes">Save new
+    attributes</button>
+</div>

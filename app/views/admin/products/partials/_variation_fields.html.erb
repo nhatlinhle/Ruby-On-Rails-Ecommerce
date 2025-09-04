@@ -1,0 +1,72 @@
+<div class="accordion-item variation-accordion-item d-none" id="variation-template">
+  <h5 class="accordion-header accordion-header-variation d-flex align-items-center pe-2">
+    <div class="accordion-button collapsed fw-bold d-flex gap-3 variation-accordion-button" type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-product-<%= variation.id  %>"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne">
+        #<%= variation.id %>
+
+        <% grouped_attrs.each do |attribute_id, pavs| %>
+          <% attribute_name = pavs.first.attribute_value.product_attribute.name %>
+          <% values = pavs.map(&:attribute_value) %>
+
+          <select class="select-variation-attribute form-control" name="product[variations][NEW_RECORD][attributes][]">
+            <option value="">Select <%= attribute_name %></option>
+            <% values.each do |value| %>
+              <option value="<%= value.id %>"><%= value.name %></option>
+            <% end %>
+          </select>
+        <% end %>
+    </div>
+
+    <button type="button" class="btn btn-danger btn-sm remove-variations pull-right">Remove</button>
+  </h5>
+
+  <div id="flush-product-<%= variation.id %>" class="accordion-collapse collapse" data-bs-parent="#accordion-variations">
+    <div class="accordion-body">
+      <div class="row">
+        <div class="upload-image col-6">
+          <a href="#" class="btn-sm upload-image-btn" data-variation-id="<%= variation.id %>">
+            <%= image_tag('/images/default-thumbnail.png',
+              alt: 'Variation Image',
+              class: 'img-thumbnail variation-image',
+              id: "preview-#{variation.id}") %>
+          </a>
+
+          <%= file_field_tag "product[variations][#{variation.id}][thumbnail]",
+            class: "d-none file-input-variation",
+            id: "file-input-#{variation.id}",
+            data: { variation_id: variation.id } %>
+        </div>
+
+        <div class="col-6">
+          <div class="form-group">
+            <label for="variation_price_<%= variation.id %>">Price</label>
+            <input type="text" class="form-control" id="variation_price_<%= variation.id %>" name="product[variations][<%= variation.id %>][price]" value="">
+          </div>
+          <div class="form-group">
+            <label for="variation_sku_<%= variation.id %>">SKU</label>
+            <input type="text" class="form-control" id="variation_sku_<%= variation.id %>" name="product[variations][<%= variation.id %>][sku]" value="">
+          </div>
+          <div class="form-group">
+            <label for="variation_stock_<%= variation.id %>">Stock quantity</label>
+            <input type="number" class="form-control" id="variation_stock_<%= variation.id %>" name="product[variations][<%= variation.id %>][stock_quantity]" value="">
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="form-group">
+        <label for="variation_description_<%= variation.id %>">Description</label>
+        <textarea class="form-control h-auto" rows="5" id="variation_description_<%= variation.id %>" name="product[variations][<%= variation.id %>][description]"></textarea>
+      </div>
+      <hr>
+      <h6>Meta data</h6>
+      <div class="row">
+        <div class="col-md-12">
+          <%= link_to "Add more", "#", class: "btn btn-secondary add-variation-meta-field", data: { variation_id: variation.id } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

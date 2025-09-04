@@ -14,4 +14,5 @@ class Product < ApplicationRecord
   # Active Storage attachments
   has_one_attached :thumbnail
   has_many_attached :gallery
+  accepts_nested_attributes_for :variations, allow_destroy: true
 end

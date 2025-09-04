@@ -1,0 +1,110 @@
+<div class="accordion accordion-flush" id="accordion-variations">
+<% grouped_attrs = @product.product_attribute_values.includes(:attribute_value).group_by(&:attribute_id) %>
+
+<% @product.variations.each do |variation| %>
+  <div class="accordion-item variation-accordion-item">
+    <h5 class="accordion-header accordion-header-variation d-flex align-items-center pe-2">
+      <div class="accordion-button collapsed fw-bold d-flex gap-3 variation-accordion-button" type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-product-<%= variation.id %>"
+              aria-expanded="false"
+              aria-controls="flush-collapseOne">
+        #<%= variation.id %>
+
+        <% grouped_attrs.each do |attribute_id, pavs| %>
+          <% attribute_name = pavs.first.attribute_value.product_attribute.name %>
+          <% values = pavs.map(&:attribute_value) %>
+
+          <% selected_value = variation.product_attribute_values.find { |v| v.attribute_value.attribute_id == attribute_id }&.attribute_value_id %>
+
+          <select class="select-variation-attribute form-control" name="product[variations][<%= variation.id %>][attributes][]" data-attribute-id="<%= attribute_id %>">
+            <option value="" disabled <%= 'selected' if selected_value.nil? %>>Select <%= attribute_name %></option>
+            <% values.each do |value| %>
+              <option value="<%= value.id %>" <%= 'selected' if value.id == selected_value %>><%= value.name %></option>
+            <% end %>
+          </select>
+        <% end %>
+      </div>
+
+      <button type="button" class="btn btn-danger btn-sm remove-variations pull-right">Remove</button>
+    </h5>
+
+    <div id="flush-product-<%= variation.id %>" class="accordion-collapse collapse" data-bs-parent="#accordion-variations">
+      <div class="accordion-body">
+        <div class="row">
+          <div class="upload-image col-6">
+            <a href="#" class="btn-sm upload-image-btn" data-variation-id="<%= variation.id %>">
+              <%= image_tag(variation.thumbnail.attached? ? url_for(variation.thumbnail) : '/images/default-thumbnail.png',
+                  alt: 'Variation Image',
+                  class: 'img-thumbnail variation-image',
+                  id: "preview-#{variation.id}") %>
+            </a>
+
+            <%= file_field_tag "product[variations][#{variation.id}][thumbnail]",
+                class: "d-none file-input-variation",
+                id: "file-input-#{variation.id}",
+                data: { variation_id: variation.id } %>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label for="variation_price_<%= variation.id %>">Price</label>
+              <input type="text" class="form-control" id="variation_price_<%= variation.id %>" name="product[variations][<%= variation.id %>][price]" value="<%= variation.price %>">
+            </div>
+            <div class="form-group">
+              <label for="variation_sku_<%= variation.id %>">SKU</label>
+              <input type="text" class="form-control" id="variation_sku_<%= variation.id %>" name="product[variations][<%= variation.id %>][sku]" value="<%= variation.sku %>">
+            </div>
+            <div class="form-group">
+              <label for="variation_stock_<%= variation.id %>">Stock quantity</label>
+              <input type="number" class="form-control" id="variation_stock_<%= variation.id %>" name="product[variations][<%= variation.id %>][stock_quantity]" value="<%= variation.stock_quantity %>">
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label for="variation_description_<%= variation.id %>">Description</label>
+          <textarea class="form-control h-auto" rows="5" id="variation_description_<%= variation.id %>" name="product[variations][<%= variation.id %>][description]"><%= variation.description %></textarea>
+        </div>
+        <hr>
+        <h6>Meta data</h6>
+        <% variation.product_metas.each_with_index do |meta, index| %>
+        <div class="row meta-field-row variation-meta-field-row-<%= variation.id %>">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="variation_meta_key_<%= variation.id %>_<%= index %>">Meta Key</label>
+              <input type="text" class="form-control" id="variation_meta_key_<%= variation.id %>_<%= index %>" name="product[variations][<%= variation.id %>][product_metas][<%= index %>][key]" value="<%= meta.key %>">
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="variation_meta_value_<%= variation.id %>_<%= index %>">Meta Value</label>
+              <input type="text" class="form-control" id="variation_meta_value_<%= variation.id %>_<%= index %>" name="product[variations][<%= variation.id %>][product_metas][<%= index %>][value]" value="<%= meta.value %>">
+            </div>
+          </div>
+
+          <div class="col-md-2 d-flex align-items-center">
+            <button type="button" class="btn btn-danger btn-sm remove-meta-field">Remove</button>
+          </div>
+        </div>
+
+        <input type="hidden" name="product[variations][<%= variation.id %>][id]" value="<%= variation.id %>">
+        <% end %>
+
+        <div class="row">
+          <div class="col-md-12">
+            <%= link_to "Add more", "#", class: "btn btn-secondary add-variation-meta-field", data: { variation_id: variation.id } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+</div>
+<div class="row mt-3">
+  <div class="col-md-12">
+    <button type="button" class="btn btn-primary add-variation pull-right">Add Variation</button>
+  </div>
+</div>
+<%= render partial: 'admin/products/partials/variation_fields', locals: { variation: OpenStruct.new(id: 'NEW_RECORD', product_metas: []), grouped_attrs: grouped_attrs } %>

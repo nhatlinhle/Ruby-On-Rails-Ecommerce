@@ -28,6 +28,7 @@ Rails.application.routes.draw do
       resources :attributes do
         collection do
           post :bulk_create, to: "attributes#bulk_create", as: :bulk_create
+          get :get_attributes_by_product_id, to: "attributes#get_attributes_by_product_id", as: :get_attributes_by_product_id
         end
       end
   end
